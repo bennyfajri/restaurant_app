@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:restaurant_app/data/models/restaurant.dart';
 import 'package:restaurant_app/ui/home_page.dart';
 import 'package:restaurant_app/ui/restaurant_detail_page.dart';
-import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:restaurant_app/ui/splash_screen.dart';
 
 import 'common/styles.dart';

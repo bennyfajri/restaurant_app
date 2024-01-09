@@ -78,10 +78,25 @@ class RestaurantDetailPage extends StatelessWidget {
                       children: [
                         const Icon(
                           Icons.place_outlined,
+                          color: Colors.black26,
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          restaurants.city as String,
+                          restaurants.city.toString(),
+                          style: Theme.of(context).textTheme.titleMedium,
+                        )
+                      ],
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.star,
+                          color: Colors.black26,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          restaurants.rating.toString(),
                           style: Theme.of(context).textTheme.titleMedium,
                         )
                       ],

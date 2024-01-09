@@ -16,7 +16,7 @@ class HomePage extends StatelessWidget {
           .loadString('assets/local_restaurant.json'),
       builder: (context, snapshot) {
         final List<Restaurants> restaurants =
-            parseListRestaurant(snapshot.data).restaurants as List<Restaurants>;
+        (parseListRestaurant(snapshot.data).restaurants ?? []);
         return ListView.builder(
           itemCount: restaurants.length,
           itemBuilder: (context, index) {

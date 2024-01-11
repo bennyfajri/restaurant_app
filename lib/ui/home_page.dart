@@ -16,13 +16,17 @@ class HomePage extends StatelessWidget {
           .loadString('assets/local_restaurant.json'),
       builder: (context, snapshot) {
         final List<Restaurants> restaurants =
-        (parseListRestaurant(snapshot.data).restaurants ?? []);
-        return ListView.builder(
-          itemCount: restaurants.length,
-          itemBuilder: (context, index) {
-            return _buildRestaurantItem(context, restaurants[index]);
-          },
-        );
+            (parseListRestaurant(snapshot.data).restaurants ?? []);
+        return restaurants.isNotEmpty
+            ? ListView.builder(
+                itemCount: restaurants.length,
+                itemBuilder: (context, index) {
+                  return _buildRestaurantItem(context, restaurants[index]);
+                },
+              )
+            : const Center(
+                child: Text("Tidak ada data"),
+              );
       },
     );
   }

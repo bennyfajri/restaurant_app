@@ -1,8 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:restaurant_app/data/models/restaurant.dart';
+import 'package:provider/provider.dart';
+import 'package:restaurant_app/data/models/restaurant_detail.dart';
+import 'package:restaurant_app/provider/restaurant_provider.dart';
 import 'package:restaurant_app/ui/restaurant_detail_page.dart';
+import 'package:restaurant_app/util/constant.dart';
 
+import '../data/models/restaurant_list.dart';
 import '../widgets/platform_widget.dart';
 
 class HomePage extends StatelessWidget {
@@ -10,23 +14,40 @@ class HomePage extends StatelessWidget {
 
   const HomePage({super.key});
 
-  FutureBuilder<String> _buildList(BuildContext context) {
-    return FutureBuilder<String>(
-      future: DefaultAssetBundle.of(context)
-          .loadString('assets/local_restaurant.json'),
-      builder: (context, snapshot) {
-        final List<Restaurants> restaurants =
-            (parseListRestaurant(snapshot.data).restaurants ?? []);
-        return restaurants.isNotEmpty
-            ? ListView.builder(
-                itemCount: restaurants.length,
-                itemBuilder: (context, index) {
-                  return _buildRestaurantItem(context, restaurants[index]);
-                },
-              )
-            : const Center(
-                child: Text("Tidak ada data"),
-              );
+  Widget _buildList(BuildContext context) {
+    return Consumer<RestaurantProvider>(
+      builder: (context, state, _) {
+        if (state.state == ResultState.loading) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (state.state == ResultState.hasData) {
+          return ListView.builder(
+            shrinkWrap: true,
+            itemCount: state.restaurantsResults.restaurants.length,
+            itemBuilder: (context, index) {
+              return _buildRestaurantItem(
+                  context, state.restaurantsResults.restaurants[index], state);
+            },
+          );
+        } else {
+          return Center(
+            child: Material(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(state.message),
+                  ElevatedButton(
+                    onPressed: () {
+                      state.fetchRestaurants();
+                    },
+                    child: const Text("Ulangi kembali"),
+                  )
+                ],
+              ),
+            ),
+          );
+        }
       },
     );
   }
@@ -44,7 +65,8 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildRestaurantItem(BuildContext context, Restaurants restaurants) {
+  Widget _buildRestaurantItem(BuildContext context, Restaurant restaurant,
+      [RestaurantProvider? state]) {
     return Material(
       child: SizedBox(
         height: 150,
@@ -58,11 +80,19 @@ class HomePage extends StatelessWidget {
           clipBehavior: Clip.hardEdge,
           child: InkWell(
             onTap: () {
-              Navigator.pushNamed(
-                context,
-                RestaurantDetailPage.routeName,
-                arguments: restaurants,
-              );
+              state?.fetchDetailRestaurant(restaurant.id);
+              if (state?.state == ResultState.loading) {
+
+              } else if (state?.state == ResultState.hasData) {
+                Navigator.pushNamed(
+                  context,
+                  RestaurantDetailPage.routeName,
+                  arguments: state?.detailRestaurantResult,
+                );
+              } else {
+
+              }
+
             },
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -72,7 +102,7 @@ class HomePage extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8.0),
                     child: Image.network(
-                      restaurants.pictureId as String,
+                      "$baseUrlImg${restaurant.pictureId}",
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -88,17 +118,20 @@ class HomePage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          restaurants.name as String,
-                          style: Theme.of(context).textTheme.titleLarge,
+                          restaurant.name,
+                          style: Theme
+                              .of(context)
+                              .textTheme
+                              .titleLarge,
                         ),
                         const SizedBox(height: 8),
                         _itemListRestaurants(
                           Icons.place,
-                          restaurants.city,
+                          restaurant.city,
                         ),
                         _itemListRestaurants(
                           Icons.star,
-                          restaurants.rating.toString(),
+                          restaurant.rating.toString(),
                         )
                       ],
                     ),
@@ -123,10 +156,13 @@ class HomePage extends StatelessWidget {
               flexibleSpace: FlexibleSpaceBar(
                 title: Text(
                   "Restaurant",
-                  style: Theme.of(context).textTheme.headlineSmall,
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .headlineSmall,
                 ),
                 titlePadding:
-                    const EdgeInsets.only(left: 16, bottom: 16, top: 32),
+                const EdgeInsets.only(left: 16, bottom: 16, top: 32),
               ),
             )
           ];

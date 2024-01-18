@@ -1,0 +1,1 @@
+const String baseUrlImg = "https://restaurant-api.dicoding.dev/images/medium/";

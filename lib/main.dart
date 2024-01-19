@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/data/api/ApiService.dart';
-import 'package:restaurant_app/data/models/restaurant_detail.dart';
-import 'package:restaurant_app/data/models/restaurant_list.dart';
 import 'package:restaurant_app/provider/restaurant_provider.dart';
 import 'package:restaurant_app/ui/home_page.dart';
 import 'package:restaurant_app/ui/restaurant_detail_page.dart';
@@ -43,8 +41,8 @@ class MyApp extends StatelessWidget {
           SplashScreen.routeName: (context) => const SplashScreen(),
           HomePage.routeName: (context) => const HomePage(),
           RestaurantDetailPage.routeName: (context) => RestaurantDetailPage(
-                restaurants:
-                    ModalRoute.of(context)?.settings.arguments as DetailRestaurant,
+                restaurantId:
+                    ModalRoute.of(context)?.settings.arguments as String,
               ),
         },
       ),

@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:flutter/widgets.dart';
-import 'package:http/http.dart';
 import 'package:restaurant_app/data/api/ApiService.dart';
 import 'package:restaurant_app/data/models/restaurant_detail.dart';
 import 'package:restaurant_app/data/models/restaurant_list.dart';
@@ -11,9 +8,7 @@ enum ResultState { loading, noData, hasData, error }
 class RestaurantProvider extends ChangeNotifier {
   final ApiService apiService;
 
-  RestaurantProvider({required this.apiService}) {
-    fetchRestaurants();
-  }
+  RestaurantProvider({required this.apiService});
 
   late RestaurantsResult _restaurantsResult;
   DetailRestaurantResult? _detailRestaurantResult;
@@ -21,9 +16,11 @@ class RestaurantProvider extends ChangeNotifier {
   String _message = "";
 
   String get message => _message;
+
   ResultState get state => _state;
 
   RestaurantsResult get restaurantsResults => _restaurantsResult;
+
   DetailRestaurantResult? get detailRestaurantResult => _detailRestaurantResult;
 
   Future<dynamic> fetchRestaurants({String? query}) async {

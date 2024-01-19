@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/provider/restaurant_provider.dart';
 import 'package:restaurant_app/ui/restaurant_detail_page.dart';
+import 'package:restaurant_app/ui/search_screen.dart';
 import 'package:restaurant_app/util/constant.dart';
 
 import '../data/models/restaurant_list.dart';
@@ -147,6 +148,13 @@ class HomePage extends StatelessWidget {
             SliverAppBar(
               pinned: true,
               expandedHeight: 100,
+              actions: [
+                IconButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, SearchScreen.routeName);
+                    },
+                    icon: const Icon(Icons.search))
+              ],
               flexibleSpace: FlexibleSpaceBar(
                 title: Text(
                   "Restaurant",
@@ -166,8 +174,13 @@ class HomePage extends StatelessWidget {
   Widget _buildIos(BuildContext context) {
     return CupertinoPageScaffold(
       child: CustomScrollView(slivers: [
-        const CupertinoSliverNavigationBar(
-          largeTitle: Text("Restaurant"),
+        CupertinoSliverNavigationBar(
+          largeTitle: const Text("Restaurant"),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pushNamed(context, SearchScreen.routeName);
+              },
+              icon: const Icon(CupertinoIcons.search)),
         ),
         SliverFillRemaining(
           child: _buildList(context),

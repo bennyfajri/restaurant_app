@@ -4,6 +4,7 @@ import 'package:restaurant_app/data/api/ApiService.dart';
 import 'package:restaurant_app/provider/restaurant_provider.dart';
 import 'package:restaurant_app/ui/home_page.dart';
 import 'package:restaurant_app/ui/restaurant_detail_page.dart';
+import 'package:restaurant_app/ui/search_screen.dart';
 import 'package:restaurant_app/ui/splash_screen.dart';
 
 import 'common/styles.dart';
@@ -44,6 +45,7 @@ class MyApp extends StatelessWidget {
                 restaurantId:
                     ModalRoute.of(context)?.settings.arguments as String,
               ),
+          SearchScreen.routeName: (context) => const SearchScreen(),
         },
       ),
     );

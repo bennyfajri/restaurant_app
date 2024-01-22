@@ -76,8 +76,11 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
     return Consumer<RestaurantProvider>(
       builder: (context, state, _) {
         if (state.state == ResultState.loading) {
-          return const Center(
-            child: CircularProgressIndicator(),
+          return Container(
+            color: Colors.white,
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
           );
         } else if (state.state == ResultState.hasData) {
           List<Category> listMenus = [

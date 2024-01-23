@@ -54,6 +54,10 @@ class _SearchBarState extends State<SearchBar> {
             Icons.search,
             color: inactive,
           ),
+          suffixIcon: _searchController.text.isNotEmpty ? IconButton(
+            onPressed: _searchController.clear,
+            icon: const Icon(Icons.clear),
+          ) : null,
           focusedBorder: OutlineInputBorder(
             borderSide: const BorderSide(width: 0.5, color: startColor),
             borderRadius: BorderRadius.circular(12),

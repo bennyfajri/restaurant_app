@@ -19,7 +19,7 @@ class ItemMenu extends StatelessWidget {
         ),
         clipBehavior: Clip.hardEdge,
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

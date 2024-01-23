@@ -22,6 +22,7 @@ class MyApp extends StatelessWidget {
       create: (context) => RestaurantProvider(apiService: ApiService()),
       child: MaterialApp(
         title: 'Restaurant App',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: Theme.of(context).colorScheme.copyWith(
               primary: primaryColor,
@@ -40,13 +41,10 @@ class MyApp extends StatelessWidget {
         initialRoute: SplashScreen.routeName,
         routes: {
           SplashScreen.routeName: (context) => const SplashScreen(),
-          HomePage.routeName: (context) {
-            return HomePage();
-          },
+          HomePage.routeName: (context) => const HomePage(),
           RestaurantDetailPage.routeName: (context) => RestaurantDetailPage(
-                restaurantId:
-                    ModalRoute.of(context)?.settings.arguments as String,
-              ),
+            pictureId: ModalRoute.of(context)?.settings.arguments as String,
+          ),
           SearchScreen.routeName: (context) => const SearchScreen(),
         },
       ),

@@ -12,10 +12,6 @@ class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   Widget _buildList(BuildContext context) {
-    Provider.of<RestaurantProvider>(
-      context,
-      listen: false,
-    ).fetchRestaurants();
     return Consumer<RestaurantProvider>(
       builder: (context, state, _) {
         if (state.state == ResultState.loading) {

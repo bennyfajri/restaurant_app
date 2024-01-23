@@ -11,7 +11,6 @@ class ItemReview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height/6,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Column(
@@ -53,7 +52,8 @@ class ItemReview extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8.0),
-            Text(customerReview.review)
+            Text(customerReview.review),
+            const SizedBox(height: 16.0)
           ],
         ),
       ),

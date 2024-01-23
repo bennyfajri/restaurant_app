@@ -33,7 +33,7 @@ class RestaurantProvider extends ChangeNotifier {
       if (restaurants.restaurants.isEmpty) {
         _state = ResultState.noData;
         notifyListeners();
-        return _message = "Empty Data";
+        return _message = "Tidak ada data";
       } else {
         _state = ResultState.hasData;
         notifyListeners();
@@ -54,7 +54,7 @@ class RestaurantProvider extends ChangeNotifier {
       if (restaurant.restaurant.id.isEmpty) {
         _state = ResultState.noData;
         notifyListeners();
-        return _message = "Empty Data";
+        return _message = "Tidak ada data";
       } else {
         _state = ResultState.hasData;
         notifyListeners();

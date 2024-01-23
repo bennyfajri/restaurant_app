@@ -6,8 +6,8 @@ String restaurantsResultToJson(RestaurantsResult data) => json.encode(data.toJso
 
 class RestaurantsResult {
   bool error;
-  String message;
-  int count;
+  String? message;
+  int? count;
   List<Restaurant> restaurants;
 
   RestaurantsResult({

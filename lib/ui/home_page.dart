@@ -22,7 +22,9 @@ class HomePage extends StatelessWidget {
         if (state.state == ResultState.loading) {
           return const SliverToBoxAdapter(
             child: Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                color: Colors.black54,
+              ),
             ),
           );
         } else if (state.state == ResultState.hasData) {
@@ -62,7 +64,12 @@ class HomePage extends StatelessWidget {
               handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
               sliver: SliverPersistentHeader(
                 delegate: SliverSearchAppBar(
-                  onSearchTermChanged: (searchTerm) {},
+                  onSearchTermChanged: (searchTerm) {
+                    Provider.of<RestaurantProvider>(
+                      context,
+                      listen: false,
+                    ).fetchRestaurants(query: searchTerm);
+                  },
                 ),
                 pinned: true,
               ),

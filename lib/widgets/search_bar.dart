@@ -44,7 +44,7 @@ class _SearchBarState extends State<SearchBar> {
       child: TextFormField(
         controller: _searchController,
         cursorColor: startColor,
-        onChanged: widget.onSearchTermChanged,
+        onFieldSubmitted: widget.onSearchTermChanged,
         style: Theme.of(context).textTheme.titleMedium,
         decoration: InputDecoration(
           hintText: "Mau belanja dimana?",

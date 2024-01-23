@@ -4,6 +4,7 @@ import 'package:restaurant_app/data/debouncer.dart';
 import 'package:restaurant_app/provider/restaurant_provider.dart';
 import 'package:restaurant_app/util/constant.dart';
 import 'package:restaurant_app/widgets/item_menu.dart';
+import 'package:restaurant_app/widgets/item_review.dart';
 
 import '../data/models/restaurant_detail.dart';
 
@@ -58,8 +59,12 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
               ),
             );
           } else if (state.state == ResultState.hasData) {
-            List<Category> listFoods = state.detailRestaurantResult!.restaurant.menus.foods;
-            List<Category> listDrinks = state.detailRestaurantResult!.restaurant.menus.drinks;
+            List<Category> listFoods =
+                state.detailRestaurantResult!.restaurant.menus.foods;
+            List<Category> listDrinks =
+                state.detailRestaurantResult!.restaurant.menus.drinks;
+            List<CustomerReview> listReview =
+                state.detailRestaurantResult?.restaurant.customerReviews ?? [];
             return CustomScrollView(
               controller: _scrollController,
               scrollDirection: Axis.vertical,
@@ -157,7 +162,9 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                             scrollDirection: Axis.horizontal,
                             itemCount: listFoods.length,
                             itemBuilder: (context, index) {
-                              return ItemMenu(menu: listFoods[index], icon: Icons.fastfood_rounded);
+                              return ItemMenu(
+                                  menu: listFoods[index],
+                                  icon: Icons.fastfood_rounded);
                             },
                           ),
                         ),
@@ -172,10 +179,33 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                             scrollDirection: Axis.horizontal,
                             itemCount: listDrinks.length,
                             itemBuilder: (context, index) {
-                              return ItemMenu(menu: listDrinks[index], icon: Icons.emoji_food_beverage_rounded);
+                              return ItemMenu(
+                                  menu: listDrinks[index],
+                                  icon: Icons.emoji_food_beverage_rounded);
                             },
                           ),
                         ),
+                        Text(
+                          "Penilaian",
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        listReview.isNotEmpty
+                            ? ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: listReview.length,
+                                itemBuilder: (context, index) {
+                                  return ItemReview(
+                                    customerReview: listReview[index],
+                                  );
+                                },
+                              )
+                            : const Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: Text(
+                                  "Belum ada review",
+                                  style: TextStyle(fontStyle: FontStyle.italic),
+                                ),
+                            ),
                       ],
                     ),
                   ),

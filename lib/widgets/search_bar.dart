@@ -44,7 +44,7 @@ class _SearchBarState extends State<SearchBar> {
       child: TextFormField(
         controller: _searchController,
         cursorColor: startColor,
-        onChanged: widget.onSearchTermChanged,
+        onFieldSubmitted: widget.onSearchTermChanged,
         style: Theme.of(context).textTheme.titleMedium,
         decoration: InputDecoration(
           hintText: "Mau belanja dimana?",
@@ -54,10 +54,10 @@ class _SearchBarState extends State<SearchBar> {
             Icons.search,
             color: inactive,
           ),
-          suffixIcon: _searchController.text.isNotEmpty ? IconButton(
-            onPressed: _searchController.clear,
-            icon: const Icon(Icons.clear),
-          ) : null,
+          // suffixIcon: _searchController.text.isNotEmpty ? IconButton(
+          //   onPressed: widget.onSearchTermChanged(_searchController.text),
+          //   icon: const Icon(Icons.search),
+          // ) : null,
           focusedBorder: OutlineInputBorder(
             borderSide: const BorderSide(width: 0.5, color: startColor),
             borderRadius: BorderRadius.circular(12),

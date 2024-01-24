@@ -189,27 +189,30 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                           "Penilaian",
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
-                        listReview.isNotEmpty
-                            ? ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: listReview.length,
-                                itemBuilder: (context, index) {
-                                  return ItemReview(
-                                    customerReview: listReview[index],
-                                  );
-                                },
-                              )
-                            : const Padding(
-                              padding: EdgeInsets.all(16.0),
-                              child: Text(
-                                  "Belum ada review",
-                                  style: TextStyle(fontStyle: FontStyle.italic),
-                                ),
-                            ),
                       ],
                     ),
                   ),
                 ),
+                listReview.isNotEmpty
+                    ? SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            return ItemReview(
+                              customerReview: listReview[index],
+                            );
+                          },
+                          childCount: listReview.length,
+                        ),
+                      )
+                    : const SliverToBoxAdapter(
+                        child: Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Text(
+                            "Belum ada review",
+                            style: TextStyle(fontStyle: FontStyle.italic),
+                          ),
+                        ),
+                      ),
               ],
             );
           } else {

@@ -136,7 +136,6 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                 )
                               ],
                             ),
-                            // const Divider(color: Colors.black12,)
                           ],
                         ),
                         const SizedBox(height: 16),

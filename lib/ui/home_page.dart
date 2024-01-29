@@ -1,99 +1,94 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:restaurant_app/provider/restaurant_provider.dart';
-import 'package:restaurant_app/ui/home_restaurants_list.dart';
-import 'package:restaurant_app/widgets/sliver_search_app_bar.dart';
+import 'package:restaurant_app/ui/restaurant_detail_page.dart';
+import 'package:restaurant_app/ui/restaurant_favorite_page.dart';
+import 'package:restaurant_app/ui/restaurants_list_page.dart';
+import 'package:restaurant_app/ui/settings_page.dart';
+
+import '../common/styles.dart';
+import '../util/notification_helper.dart';
 import '../widgets/platform_widget.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   static const routeName = '/home_page';
 
   const HomePage({super.key});
 
-  Widget _buildList(BuildContext context) {
-    return Consumer<RestaurantProvider>(
-      builder: (context, state, _) {
-        if (state.state == ResultState.loading) {
-          return const SliverToBoxAdapter(
-            child: Center(
-              child: CircularProgressIndicator(
-                color: Colors.black54,
-              ),
-            ),
-          );
-        } else if (state.state == ResultState.hasData) {
-          return HomeRestaurantList(
-              restaurants: state.restaurantsResults.restaurants);
-        } else {
-          return SliverToBoxAdapter(
-            child: Center(
-              child: Material(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(state.message),
-                    ElevatedButton(
-                      onPressed: () {
-                        state.fetchRestaurants();
-                      },
-                      child: const Text("Ulangi kembali"),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          );
-        }
-      },
-    );
-  }
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
 
-  Widget _buildNestedScrollView() {
-    return NestedScrollView(
-      headerSliverBuilder: (context, innerBoxScrolled) {
-        return [
-          SliverOverlapAbsorber(
-            handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-            sliver: SliverPersistentHeader(
-              delegate: SliverSearchAppBar(
-                onSearchTermChanged: (searchTerm) {
-                  Provider.of<RestaurantProvider>(
-                    context,
-                    listen: false,
-                  ).fetchRestaurants(query: searchTerm);
-                },
-              ),
-              pinned: true,
-            ),
-          ),
-        ];
-      },
-      body: Builder(
-        builder: (context) => CustomScrollView(
-          slivers: [
-            SliverOverlapInjector(
-              handle:
-              NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-            ),
-            _buildList(context)
-          ],
-        ),
-      ),
-    );
+class _HomePageState extends State<HomePage> {
+  int _bottomNavIndex = 0;
+  static const String _restaurantText = 'Restaurant';
+
+  final NotificationHelper _notificationHelper = NotificationHelper();
+
+  final List<Widget> _listWidget = [
+    const HomeRestaurantList(),
+    const RestaurantFavoritePage(),
+    const SettingsPage(),
+  ];
+
+  final List<BottomNavigationBarItem> _bottomNavBarItems = [
+    BottomNavigationBarItem(
+      icon: Icon(Platform.isIOS ? CupertinoIcons.location : Icons.restaurant),
+      label: _restaurantText,
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(
+          Platform.isIOS ? CupertinoIcons.bookmark : Icons.favorite_border),
+      label: RestaurantFavoritePage.favoriteTitle,
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Platform.isIOS ? CupertinoIcons.settings : Icons.settings),
+      label: SettingsPage.settingsTitle,
+    ),
+  ];
+
+  void _onBottomNavTapped(int index) {
+    setState(() {
+      _bottomNavIndex = index;
+    });
   }
 
   Widget _buildAndroid(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: _buildNestedScrollView(),
+      body: _listWidget[_bottomNavIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: secondaryColor,
+        currentIndex: _bottomNavIndex,
+        items: _bottomNavBarItems,
+        onTap: _onBottomNavTapped,
+      ),
     );
   }
 
   Widget _buildIos(BuildContext context) {
-    return CupertinoPageScaffold(
-      child: _buildNestedScrollView(),
+    return CupertinoTabScaffold(
+      tabBar: CupertinoTabBar(
+        items: _bottomNavBarItems,
+        activeColor: secondaryColor,
+      ),
+      tabBuilder: (context, index) {
+        return _listWidget[index];
+      },
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _notificationHelper.configureSelectNotificationSubject(
+        RestaurantDetailPage.routeName, context);
+  }
+
+  @override
+  void dispose() {
+    selectNotificationSubject.close();
+    super.dispose();
   }
 
   @override

@@ -1,72 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:restaurant_app/data/debouncer.dart';
+import 'package:restaurant_app/data/models/restaurant_list.dart';
+import 'package:restaurant_app/provider/database_provider.dart';
 import 'package:restaurant_app/provider/restaurant_provider.dart';
 import 'package:restaurant_app/util/constant.dart';
 import 'package:restaurant_app/widgets/item_menu.dart';
 import 'package:restaurant_app/widgets/item_review.dart';
 
 import '../data/models/restaurant_detail.dart';
+import '../util/result_state.dart';
 
-class RestaurantDetailPage extends StatefulWidget {
+class RestaurantDetailPage extends StatelessWidget {
   static const routeName = "/restaurant_detail";
   final String pictureId;
 
   const RestaurantDetailPage({super.key, required this.pictureId});
 
   @override
-  State<RestaurantDetailPage> createState() => _RestaurantDetailPageState();
-}
-
-class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
-  final ScrollController _scrollController = ScrollController();
-  final _scrollListener = Debouncer(const Duration(milliseconds: 50));
-  bool isScrolled = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(() {
-      _scrollListener.run(() {
-        setState(() {
-          isScrolled = _scrollController.hasClients &&
-              _scrollController.offset > (kToolbarHeight / 2);
-        });
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    _scrollListener.dispose();
-    super.dispose();
-  }
-
-  bool isScrolledView(ScrollController controller) {
-    return controller.hasClients && controller.offset > (kToolbarHeight / 2);
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer<RestaurantProvider>(
-        builder: (context, state, _) {
-          if (state.state == ResultState.loading) {
+      body: Consumer2<RestaurantProvider, DatabaseProvider>(
+        builder: (context, restaurantProvider, databaseProvider, _) {
+          DetailRestaurant? restaurants =
+              restaurantProvider.detailRestaurantResult?.restaurant;
+          if (restaurantProvider.state == ResultState.loading) {
             return const Center(
               child: CircularProgressIndicator(
                 color: Colors.black54,
               ),
             );
-          } else if (state.state == ResultState.hasData) {
-            List<Category> listFoods =
-                state.detailRestaurantResult!.restaurant.menus.foods;
-            List<Category> listDrinks =
-                state.detailRestaurantResult!.restaurant.menus.drinks;
+          } else if (restaurantProvider.state == ResultState.hasData) {
+            List<Category>? listFoods = restaurants?.menus.foods;
+            List<Category>? listDrinks = restaurants?.menus.drinks;
             List<CustomerReview> listReview =
-                state.detailRestaurantResult?.restaurant.customerReviews ?? [];
+                restaurants?.customerReviews ?? [];
             return CustomScrollView(
-              controller: _scrollController,
               scrollDirection: Axis.vertical,
               physics: const BouncingScrollPhysics(),
               slivers: [
@@ -77,20 +45,53 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                   automaticallyImplyLeading: false,
                   flexibleSpace: FlexibleSpaceBar(
                     background: Hero(
-                      tag: widget.pictureId,
+                      tag: pictureId,
                       child: Image.network(
-                        ("$baseUrlImg${state.detailRestaurantResult!.restaurant.pictureId}"),
+                        ("$baseUrlImg${restaurants?.pictureId}"),
                         fit: BoxFit.fitWidth,
                       ),
                     ),
                     title: Text(
-                      state.detailRestaurantResult!.restaurant.name,
+                      restaurants?.name ?? "",
                       style: TextStyle(
-                        color: isScrolled ? Colors.black : Colors.white,
+                        color: Theme.of(context).colorScheme.secondary,
                       ),
                     ),
                     titlePadding: const EdgeInsets.only(left: 16, bottom: 16),
                   ),
+                  actions: [
+                    FutureBuilder<bool>(
+                        future: databaseProvider.isFavorited(restaurantProvider
+                            .detailRestaurantResult!.restaurant.id),
+                        builder: (context, snapshot) {
+                          var isBookmarked = snapshot.data ?? false;
+                          return isBookmarked
+                              ? IconButton(
+                                  icon: const Icon(Icons.favorite),
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
+                                  onPressed: () => databaseProvider
+                                      .removeFavorited(restaurantProvider
+                                          .detailRestaurantResult!
+                                          .restaurant
+                                          .id),
+                                )
+                              : IconButton(
+                                  icon: const Icon(Icons.favorite_border),
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
+                                  onPressed: () =>
+                                      databaseProvider.addFavorite(Restaurant(
+                                    id: restaurants?.id ?? "",
+                                    name: restaurants?.name ?? "",
+                                    description: restaurants?.description ?? "",
+                                    pictureId: restaurants?.pictureId ?? "",
+                                    city: restaurants?.city ?? "",
+                                    rating: restaurants?.rating ?? 0.0,
+                                  )),
+                                );
+                        })
+                  ],
                 ),
                 // body/content
                 SliverToBoxAdapter(
@@ -111,7 +112,8 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  state.detailRestaurantResult!.restaurant.city
+                                  restaurantProvider
+                                      .detailRestaurantResult!.restaurant.city
                                       .toString(),
                                   style:
                                       Theme.of(context).textTheme.titleMedium,
@@ -128,7 +130,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  state
+                                  restaurantProvider
                                       .detailRestaurantResult!.restaurant.rating
                                       .toString(),
                                   style:
@@ -143,7 +145,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                           "Deskripsi",
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
-                        Text(state
+                        Text(restaurantProvider
                             .detailRestaurantResult!.restaurant.description),
                         const SizedBox(height: 16),
                         Text(
@@ -159,11 +161,17 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                           height: 120,
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
-                            itemCount: listFoods.length,
+                            itemCount: listFoods?.length,
                             itemBuilder: (context, index) {
-                              return ItemMenu(
-                                  menu: listFoods[index],
-                                  icon: Icons.fastfood_rounded);
+                              return listFoods!.isNotEmpty
+                                  ? ItemMenu(
+                                      menu: listFoods[index],
+                                      icon: Icons.fastfood_rounded)
+                                  : const Text(
+                                      "Menu tidak tersedia",
+                                      style: TextStyle(
+                                          fontStyle: FontStyle.italic),
+                                    );
                             },
                           ),
                         ),
@@ -176,11 +184,17 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                           height: 120,
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
-                            itemCount: listDrinks.length,
+                            itemCount: listDrinks?.length,
                             itemBuilder: (context, index) {
-                              return ItemMenu(
-                                  menu: listDrinks[index],
-                                  icon: Icons.emoji_food_beverage_rounded);
+                              return listDrinks!.isNotEmpty
+                                  ? ItemMenu(
+                                      menu: listDrinks[index],
+                                      icon: Icons.emoji_food_beverage_rounded)
+                                  : const Text(
+                                      "Menu tidak tersedia",
+                                      style: TextStyle(
+                                          fontStyle: FontStyle.italic),
+                                    );
                             },
                           ),
                         ),
@@ -220,10 +234,10 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(state.message),
+                    Text(restaurantProvider.message),
                     ElevatedButton(
                       onPressed: () {
-                        state.fetchRestaurants();
+                        restaurantProvider.fetchRestaurants();
                       },
                       child: const Text("Ulangi kembali"),
                     )

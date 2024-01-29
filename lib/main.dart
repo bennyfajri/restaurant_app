@@ -1,15 +1,43 @@
+import 'dart:io';
+
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
+import 'package:restaurant_app/provider/database_provider.dart';
+import 'package:restaurant_app/provider/preferences_provider.dart';
 import 'package:restaurant_app/provider/restaurant_provider.dart';
+import 'package:restaurant_app/provider/scheduling_provider.dart';
 import 'package:restaurant_app/ui/home_page.dart';
 import 'package:restaurant_app/ui/restaurant_detail_page.dart';
 import 'package:restaurant_app/ui/search_screen.dart';
 import 'package:restaurant_app/ui/splash_screen.dart';
+import 'package:restaurant_app/util/background_service.dart';
+import 'package:restaurant_app/util/notification_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'common/styles.dart';
+import 'common/navigation.dart';
+import 'data/db/detabase_helper.dart';
+import 'data/preferences/preferences_helper.dart';
 
-void main() {
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final NotificationHelper notificationHelper = NotificationHelper();
+  final BackgroundService service = BackgroundService();
+
+  service.initializeIsolate();
+
+  if (Platform.isAndroid) {
+    await AndroidAlarmManager.initialize();
+  }
+  await notificationHelper.initNotifications(flutterLocalNotificationsPlugin);
+
   runApp(const MyApp());
 }
 
@@ -18,34 +46,52 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => RestaurantProvider(apiService: ApiService()),
-      child: MaterialApp(
-        title: 'Restaurant App',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: Theme.of(context).colorScheme.copyWith(
-              primary: primaryColor,
-              onPrimary: Colors.black,
-              secondary: secondaryColor),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: secondaryColor,
-              foregroundColor: Colors.white,
-              textStyle: const TextStyle(),
-              shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(0))),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => RestaurantProvider(apiService: ApiService()),
+        ),
+        ChangeNotifierProvider(create: (_) => SchedulingProvider()),
+        ChangeNotifierProvider(
+          create: (_) => PreferencesProvider(
+            preferencesHelper: PreferencesHelper(
+              sharedPreferences: SharedPreferences.getInstance(),
             ),
           ),
         ),
-        initialRoute: SplashScreen.routeName,
-        routes: {
-          SplashScreen.routeName: (context) => const SplashScreen(),
-          HomePage.routeName: (context) => const HomePage(),
-          RestaurantDetailPage.routeName: (context) => RestaurantDetailPage(
-            pictureId: ModalRoute.of(context)?.settings.arguments as String,
-          ),
-          SearchScreen.routeName: (context) => const SearchScreen(),
+        ChangeNotifierProvider(
+          create: (_) => DatabaseProvider(databaseHelper: DatabaseHelper()),
+        ),
+      ],
+      child: Consumer<PreferencesProvider>(
+        builder: (context, provider, child) {
+          return MaterialApp(
+            title: 'Restaurant App',
+            debugShowCheckedModeBanner: false,
+            theme: provider.themeData,
+            builder: (context, child) {
+              return CupertinoTheme(
+                data: CupertinoThemeData(
+                  brightness:
+                      provider.isDarkTheme ? Brightness.dark : Brightness.light,
+                ),
+                child: Material(
+                  child: child,
+                ),
+              );
+            },
+            navigatorKey: navigatorKey,
+            initialRoute: SplashScreen.routeName,
+            routes: {
+              SplashScreen.routeName: (context) => const SplashScreen(),
+              HomePage.routeName: (context) => const HomePage(),
+              RestaurantDetailPage.routeName: (context) => RestaurantDetailPage(
+                    pictureId:
+                        ModalRoute.of(context)?.settings.arguments as String,
+                  ),
+              SearchScreen.routeName: (context) => const SearchScreen(),
+            },
+          );
         },
       ),
     );

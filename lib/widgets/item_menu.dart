@@ -26,7 +26,8 @@ class ItemMenu extends StatelessWidget {
               Icon(
                 icon,
                 size: 40,
-                color: Colors.black12,
+                color:
+                    Theme.of(context).colorScheme.onBackground.withOpacity(0.5),
               ),
               const SizedBox(height: 8),
               Column(

@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
-
-import 'constant.dart';
+import 'package:restaurant_app/common/styles.dart';
 
 class BackgroundWave extends StatelessWidget {
   final double height;
@@ -17,7 +16,7 @@ class BackgroundWave extends StatelessWidget {
           width: MediaQuery.of(context).size.width,
           height: 280,
           decoration: const BoxDecoration(
-            gradient: LinearGradient(colors: [startColor, endColorColor]),
+            gradient: LinearGradient(colors: [primaryColor, secondaryColor]),
           ),
         ),
       ),

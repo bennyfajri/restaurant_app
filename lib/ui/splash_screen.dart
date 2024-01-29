@@ -11,7 +11,7 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedSplashScreen(
       splash: "assets/coffee_shop_amico.png",
-      splashIconSize: MediaQuery.sizeOf(context).width/2,
+      splashIconSize: MediaQuery.sizeOf(context).width / 2,
       nextScreen: const HomePage(),
       splashTransition: SplashTransition.fadeTransition,
     );

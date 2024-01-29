@@ -4,7 +4,8 @@ import 'package:restaurant_app/data/models/restaurant_detail.dart';
 
 class ItemReview extends StatelessWidget {
   final CustomerReview customerReview;
-  static Color avatarColor = Color((math.Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0);
+  static Color avatarColor =
+      Color((math.Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0);
 
   const ItemReview({super.key, required this.customerReview});
 

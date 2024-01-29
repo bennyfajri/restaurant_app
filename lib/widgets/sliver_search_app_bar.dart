@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:restaurant_app/util/constant.dart';
+import 'package:restaurant_app/common/styles.dart';
 import 'package:restaurant_app/widgets/search_bar.dart' as sc;
+
 import '../util/background_wave.dart';
 
 class SliverSearchAppBar extends SliverPersistentHeaderDelegate {
@@ -32,12 +33,12 @@ class SliverSearchAppBar extends SliverPersistentHeaderDelegate {
               height: 280,
               decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomRight,
-                    colors: [startColor, endColorColor],
-                    stops: [0.0, 0.51],
-                    tileMode: TileMode.clamp,
-                  )),
+                begin: Alignment.topCenter,
+                end: Alignment.bottomRight,
+                colors: [startColor, endColor],
+                stops: [0.0, 0.51],
+                tileMode: TileMode.clamp,
+              )),
             ),
           ),
         ),
@@ -49,11 +50,12 @@ class SliverSearchAppBar extends SliverPersistentHeaderDelegate {
             margin: const EdgeInsets.only(left: 16),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 80),
                 Text(
                   "Restaurant App",
-                  style: Theme.of(context).textTheme.headlineLarge,
+                  style: Theme.of(context).textTheme.headlineMedium,
                 ),
                 Text(
                   "Recommendation restaurant for you",
@@ -65,9 +67,7 @@ class SliverSearchAppBar extends SliverPersistentHeaderDelegate {
         ),
         Positioned(
           top: 64 + searchExtraOffset,
-          child: sc.SearchBar(
-            onSearchTermChanged: onSearchTermChanged
-          ),
+          child: sc.SearchBar(onSearchTermChanged: onSearchTermChanged),
         )
       ],
     );

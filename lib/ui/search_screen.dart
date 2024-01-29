@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -26,17 +25,17 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
           child: Column(
             children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Card(
                   child: ListTile(
-                    leading: Icon(Icons.search),
+                    leading: const Icon(Icons.search),
                     title: TextField(
                       controller: searchController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                           border: InputBorder.none,
                           hintText: "Mau cari restoran apa?"),
                     ),

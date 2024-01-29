@@ -2,8 +2,9 @@ import 'package:flutter/widgets.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/models/restaurant_detail.dart';
 import 'package:restaurant_app/data/models/restaurant_list.dart';
+import 'package:http/http.dart' as http;
 
-enum ResultState { loading, noData, hasData, error }
+import '../util/result_state.dart';
 
 class RestaurantProvider extends ChangeNotifier {
   final ApiService apiService;
@@ -30,9 +31,10 @@ class RestaurantProvider extends ChangeNotifier {
       _state = ResultState.loading;
       notifyListeners();
       final restaurants = query == null
-          ? await apiService.getRestaurants()
-          : await apiService.getRestaurants(query: query);
-      if (restaurants.restaurants.isEmpty) {
+          ? await apiService.getRestaurants(client: http.Client())
+          : await apiService.getRestaurants(
+              client: http.Client(), query: query);
+      if (restaurants.restaurants!.isEmpty) {
         _state = ResultState.noData;
         notifyListeners();
         return _message = "Tidak ada data";
